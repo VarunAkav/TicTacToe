@@ -1,7 +1,5 @@
 # This file contains the game play
 import math
-from functools import reduce
-import random
 
 class Square:
     def __init__(self):
@@ -19,14 +17,6 @@ class Player:
     def sendMove(self):
         return int(input("{name}, select the cell to place the marker(0-8): ".format(name = self.name)))
 
-    def getBoard(self,board):
-        print('#############')
-        print('# {} | {} | {} #'.format(board.squares[6].value,board.squares[7].value,board.squares[8].value))
-        print('#-----------#')
-        print('# {} | {} | {} #'.format(board.squares[3].value,board.squares[4].value,board.squares[5].value))
-        print('#-----------#')
-        print('# {} | {} | {} #'.format(board.squares[0].value,board.squares[1].value,board.squares[2].value))
-        print('#############')
 class Board:
     def __init__(self,px:Player,po:Player):
         self.gameOn = False
@@ -69,12 +59,13 @@ class Board:
         self.winner = ''            # Indicating Draw
     
     def showBoard(self):
-        self.playerTurn.getBoard(self)
-        # print('{} | {} | {}'.format(self.squares[6].value,self.squares[7].value,self.squares[8].value))
-        # print('---------')
-        # print('{} | {} | {}'.format(self.squares[3].value,self.squares[4].value,self.squares[5].value))
-        # print('---------')
-        # print('{} | {} | {}'.format(self.squares[0].value,self.squares[1].value,self.squares[2].value))
+        print('#############')
+        print('# {} | {} | {} #'.format(self.squares[6].value,self.squares[7].value,self.squares[8].value))
+        print('#-----------#')
+        print('# {} | {} | {} #'.format(self.squares[3].value,self.squares[4].value,self.squares[5].value))
+        print('#-----------#')
+        print('# {} | {} | {} #'.format(self.squares[0].value,self.squares[1].value,self.squares[2].value))
+        print('#-----------#')
     
     def playMove(self,sq: int):
         if self.squares[sq].value == ' ':
@@ -93,7 +84,7 @@ class Board:
         else:
             print('The winner of the game is {}!'.format(
                     list(filter(lambda x: x.marker == self.winner,(self.px,self.po)))[0].name)
-                )       ### Change this
+                )
         self.winner = None
 
     def play(self):
@@ -109,81 +100,42 @@ class Board:
         self.gameOn = False
     
     def copyBoard(self):
-        newBrd = Board(self.px,self.po)
+        newBrd = Board()
         for sq in range(9):
             newBrd.squares[sq].value = self.squares[sq].value
-        newBrd.playerTurn = self.playerTurn
+        newBrd.turn = self.turn
         newBrd.movesPlayed = self.movesPlayed
         return newBrd
 
 
-class BotPlayer(Player):
-    def __init__(self,marker:str):
-        # Player.__init__('Akari',marker)
-        self.name = 'Akari'
-        self.marker = marker
-    
-    def getBoard(self, board):
-        self.board = board
-
-    def findBoardScores(self,board:Board):
-        if board.winner:
-            return -1
-        if board.winner == '':
-            return 0
+# class BotPlayer(Player):
+#     def __init__(self,board:Board,marker:str):
+#         self.board = board
+#         self.marker = marker
         
-        nxtMoves = self.findAllPossibleNxtMoves(board)
-        nxtScores = []
-        for nxtBoard in nxtMoves:
-            nxtScores.append(self.findBoardScores(nxtBoard))
-        
-        if board.playerTurn == self:
-            return -min(nxtScores)/len(nxtMoves)
-        return -reduce(lambda x,y: x+y,nxtScores)/len(nxtMoves)
+#     def findWinningCases(self,board):
+#         pass
 
-    def sendMove(self):
-        nxtMoves = self.findAllPossibleNxtMoves(self.board)
-        nxtScores = []
-        for nxtBoard in nxtMoves:
-            nxtScores.append(self.findBoardScores(nxtBoard))
-        print("Akari: list of possible scores is: ",nxtScores)
+#     def sendMove(self):
+#         pass
 
-        bestScore = min(nxtScores)
-        # print('Akari: Best score is')
-        bestScoreMoves = []
-        for mv,score in enumerate(nxtScores):
-            if score == bestScore:
-                bestScoreMoves.append(mv)
-        
-        nxtMove = bestScoreMoves[random.randrange(0,len(bestScoreMoves))]
-        possibleMoves = []
-        for sq in range(9):
-            if self.board.squares[sq].value == ' ':
-                possibleMoves.append(sq)
-        return possibleMoves[nxtMove]
-
-    def findAllPossibleNxtMoves(self,board:Board):
-        if board.winner != None:
-            return []
-        listOfMoves = []
-        for sq in range(9):
-            if board.squares[sq].value == ' ':
-                newBrd = board.copyBoard()
-                newBrd.playMove(sq)
-                listOfMoves.append(newBrd)
-        return listOfMoves
+#     def findAllPossibleNxtMoves(self,board:Board):
+#         if board.winner != None:
+#             return []
+#         listOfMoves = []
+#         for sq in range(9):
+#             if board.squares[sq].value == ' ':
+#                 newBrd = board.copyBoard()
+#                 newBrd.playMove(sq)
+#                 listOfMoves.append(newBrd)
+#         return listOfMoves
 
 
 #######################
 
 def gameStart():
     P1 = Player(input('Enter the name of Player 1: '),'x')
-    if P1.name == '_Akari':
-        P1 = BotPlayer('x')
     P2 = Player(input('Enter the name of Player 2: '),'o')
-    if P2.name == '_Akari':
-        P2 = BotPlayer('o')
-
     Brd = Board(P1,P2)
     Brd.play()
 
