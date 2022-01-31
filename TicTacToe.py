@@ -17,7 +17,11 @@ class Player:
         self.marker = marker
 
     def sendMove(self):
-        return int(input("{name}, select the cell to place the marker(0-8): ".format(name = self.name)))
+        player_input = int(input("{name}, select the cell to place the marker(0-8): ".format(name = self.name)))
+        if player_input in range(0,9):
+            return player_input
+        print("Please enter a number from 0-8")
+        return self.sendMove()
 
     def getBoard(self,board):
         print('#############')
@@ -146,7 +150,7 @@ class BotPlayer(Player):
         nxtScores = []
         for nxtBoard in nxtMoves:
             nxtScores.append(self.findBoardScores(nxtBoard))
-        print("Akari: list of possible scores is: ",nxtScores)
+        # print("Akari: list of possible scores is: ",nxtScores)
 
         bestScore = min(nxtScores)
         # print('Akari: Best score is')
